@@ -167,7 +167,12 @@ void main(void) {
 	// ray
 	vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
 	vec3 ori = vec3(0.0,3.5,time*5.0);
-	vec3 dir = normalize(vec3(uv.xy,-2.0)); dir.z += length(uv) * 0.15;
+	//z is -1.0 here so fov/2 is 45.0
+	vec3 dir = normalize(vec3(uv.xy,-1.0));
+	//this gives you a little fish eye lens effect
+	// dir.z += length(uv) * 0.15;
+
+	//then you change the angle using this
 	dir = normalize(dir) * fromEuler(ang);
 
 	// tracing
