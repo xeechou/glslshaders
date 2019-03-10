@@ -74,6 +74,7 @@ float sea_octave(vec2 uv, float choppy) {
 	return pow(1.0-pow(wv.x * wv.y,0.65),choppy);
 }
 
+//distance function of teh sea
 float map(vec3 p) {
 	float freq = SEA_FREQ;
 	float amp = SEA_HEIGHT;
@@ -125,7 +126,7 @@ vec3 getSeaColor(vec3 p, vec3 n, vec3 l, vec3 eye, vec3 dist) {
 	return color;
 }
 
-// tracing
+// get the normal using deltas.
 vec3 getNormal(vec3 p, float eps) {
 	vec3 n;
 	n.y = map_detailed(p);
@@ -138,6 +139,8 @@ vec3 getNormal(vec3 p, float eps) {
 float heightMapTracing(vec3 ori, vec3 dir, out vec3 p) {
 	float tm = 0.0;
 	float tx = 1000.0;
+	//first take the distance function with max distance, if it is too far,
+	//we just return
 	float hx = map(ori + dir * tx);
 	if(hx > 0.0) return tx;
 	float hm = map(ori + dir * tm);
