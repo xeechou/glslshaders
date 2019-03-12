@@ -8,15 +8,42 @@ const float EPSILON	= 1e-3;
 #define EPSILON_NRM (0.1 / u_resolution.x)
 
 
+float intersectSDF(float da, float db)
+{
+	return max(da, db);
+}
+
+float unionSDF(float da, float db)
+{
+	return min(da, db);
+}
+
+float differenceSDF(float da, float db)
+{
+	return max(da, -db);
+}
+
 /**
  * Signed distance function for a sphere centered at the origin with radius 1.0;
  */
-float sphereSDF(vec3 samplePoint) {
-    return length(samplePoint) - 1.0;
+float sphereSDF(vec3 samplePoint)
+{
+	return length(samplePoint) - 1.0;
+}
+
+float boxSDF(vec3 samplePoint, vec3 extent)
+{
+	vec3 d = abs(samplePoint) - extent;
+	float inside_dist = min(max(d.x, max(d.y, d.z)), 0.0);
+	float outside_dist = length(max(d, 0.0));
+	return inside_dist + outside_dist;
 }
 
 float sceneSDF(vec3 samplePoint) {
-	return sphereSDF(samplePoint);
+
+	float sd = sphereSDF(samplePoint/1.2) * 1.2;
+	float bd = boxSDF(samplePoint, vec3(1.0)) * 1.2;
+	return intersectSDF(sd, bd);
 }
 
 vec3 getnormal(vec3 p)
@@ -34,7 +61,7 @@ float raymarching(vec3 orig, vec3 dir, out vec3 p)
 	float depth = 0.0;
 	float max_dist = 1000.0;
 	for (int i = 0; i < NUM_STEPS; i++) {
-		float dist = sphereSDF(orig + dir * depth);
+		float dist = sceneSDF(orig + dir * depth);
 		p = orig + dir * (depth + dist);
 
 		if (dist < EPSILON)
